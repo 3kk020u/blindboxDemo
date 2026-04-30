@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>HopeGoo Flight Mystery Box</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a1a; color: #fff; min-height: 100vh; overflow-x: hidden; }
+
+/* ===== 页面容器 ===== */
+.page { display: none; min-height: 100vh; padding: 0 20px 40px; }
+.page.active { display: flex; flex-direction: column; animation: fadeIn .4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===== 顶部导航 ===== */
+.top-bar { display: flex; align-items: center; padding: 16px 0; position: sticky; top: 0; z-index: 10; background: linear-gradient(to bottom, #0a0a1a 60%, transparent); }
+.back-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.1); border: none; color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+.top-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; }
+
+/* ===== 语言切换 ===== */
+.lang-switch { position: fixed; top: 16px; right: 16px; z-index: 100; display: flex; gap: 4px; background: rgba(255,255,255,.08); padding: 4px; border-radius: 20px; backdrop-filter: blur(10px); }
+.lang-btn { padding: 6px 12px; border: none; background: transparent; color: rgba(255,255,255,.5); font-size: 12px; font-weight: 600; border-radius: 16px; cursor: pointer; transition: all .2s; }
+.lang-btn.active { background: rgba(255,255,255,.15); color: #fff; }
+
+/* ===== 首页 ===== */
+.hero { text-align: center; padding-top: 40px; }
+.logo { font-size: 28px; font-weight: 800; letter-spacing: 2px; background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+.tagline { color: rgba(255,255,255,.6); font-size: 14px; margin-bottom: 32px; }
+
+.blind-box-visual { width: 160px; height: 160px; margin: 0 auto 24px; position: relative; cursor: pointer; }
+.box-body { width: 160px; height: 130px; background: linear-gradient(145deg, #ff6b6b, #ee5a24); border-radius: 16px; position: absolute; bottom: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 20px 60px rgba(255,107,107,.3); }
+.box-body::after { content: '?'; font-size: 56px; font-weight: 900; color: rgba(255,255,255,.9); }
+.box-lid { width: 176px; height: 40px; background: linear-gradient(145deg, #ff8a5c, #ff6348); border-radius: 10px 10px 4px 4px; position: absolute; top: 0; left: -8px; box-shadow: 0 -4px 20px rgba(255,99,72,.3); transition: transform .6s cubic-bezier(.68,-.55,.27,1.55); transform-origin: left bottom; }
+.blind-box-visual:hover .box-lid, .blind-box-visual.opening .box-lid { transform: rotateZ(-30deg) translateY(-20px); }
+.box-ribbon { width: 24px; height: 100%; background: linear-gradient(180deg, #ffd93d, #f9ca24); position: absolute; left: 50%; transform: translateX(-50%); border-radius: 0 0 10px 10px; }
+
+.price-tag { font-size: 36px; font-weight: 900; margin-bottom: 4px; }
+.price-tag span { font-size: 18px; font-weight: 400; color: rgba(255,255,255,.6); }
+.original-price { color: rgba(255,255,255,.3); text-decoration: line-through; font-size: 13px; margin-bottom: 20px; }
+
+/* ===== 规则说明 ===== */
+.rules-section { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 16px; margin: 20px 0; text-align: left; }
+.rules-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.rules-list { font-size: 12px; color: rgba(255,255,255,.6); line-height: 1.8; padding-left: 0; list-style: none; }
+.rules-list li { margin-bottom: 6px; padding-left: 16px; position: relative; }
+.rules-list li::before { content: '•'; position: absolute; left: 0; color: #ff6348; }
+.rules-highlight { color: #ffd93d; font-weight: 600; }
+.rules-tag { display: inline-block; background: rgba(107,203,119,.15); color: #6bcb77; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-left: 4px; }
+
+/* ===== 出发地列表 ===== */
+.departure-section { margin: 20px 0; }
+.departure-title { font-size: 13px; color: rgba(255,255,255,.5); margin-bottom: 10px; }
+.departure-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.departure-tag { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); padding: 4px 10px; border-radius: 6px; font-size: 11px; color: rgba(255,255,255,.5); }
+.departure-tag span { color: rgba(255,255,255,.8); font-weight: 600; }
+
+/* ===== 按钮 ===== */
+.btn { width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all .2s; position: relative; overflow: hidden; }
+.btn:active { transform: scale(.97); }
+.btn-primary { background: linear-gradient(135deg, #ff6b6b, #ff6348); color: #fff; box-shadow: 0 8px 30px rgba(255,99,72,.35); }
+.btn-secondary { background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.15); }
+.btn-group { background: linear-gradient(135deg, #6bcb77, #4d96ff); color: #fff; box-shadow: 0 8px 30px rgba(77,150,255,.35); }
+.btn-reroll { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; box-shadow: 0 8px 30px rgba(124,58,237,.3); }
+.btn-sm { padding: 10px 20px; width: auto; font-size: 14px; border-radius: 10px; }
+.btn:disabled { opacity: .4; pointer-events: none; }
+.btn-stack { display: flex; flex-direction: column; gap: 12px; margin-top: auto; padding-top: 20px; }
+
+/* ===== 模式选择 ===== */
+.mode-cards { display: flex; flex-direction: column; gap: 16px; margin: 32px 0; }
+.mode-card { background: rgba(255,255,255,.05); border: 2px solid rgba(255,255,255,.08); border-radius: 20px; padding: 24px; cursor: pointer; transition: all .3s; }
+.mode-card.selected { border-color: #ff6348; background: rgba(255,99,72,.08); }
+.mode-card:active { transform: scale(.98); }
+.mode-icon { font-size: 36px; margin-bottom: 12px; }
+.mode-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.mode-desc { font-size: 13px; color: rgba(255,255,255,.5); line-height: 1.5; }
+.mode-badge { display: inline-block; background: linear-gradient(135deg, #6bcb77, #4d96ff); padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-left: 6px; }
+
+/* ===== 表单 ===== */
+.form-section { margin-bottom: 24px; }
+.form-label { font-size: 13px; color: rgba(255,255,255,.5); margin-bottom: 8px; display: block; }
+.form-input { width: 100%; padding: 14px 16px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; color: #fff; font-size: 15px; outline: none; transition: border-color .2s; }
+.form-input:focus { border-color: #ff6348; }
+.form-input::placeholder { color: rgba(255,255,255,.25); }
+.form-row { display: flex; gap: 12px; }
+.form-row .form-group { flex: 1; }
+.form-group { margin-bottom: 16px; }
+.form-hint { font-size: 11px; color: rgba(255,255,255,.3); margin-top: 6px; }
+
+/* ===== 搜索输入框 ===== */
+.search-container { position: relative; }
+.search-results { position: absolute; top: 100%; left: 0; right: 0; background: #1a1a3e; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; margin-top: 4px; max-height: 240px; overflow-y: auto; z-index: 20; display: none; }
+.search-results.show { display: block; }
+.search-item { padding: 12px 16px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background .2s; }
+.search-item:hover, .search-item.selected { background: rgba(255,255,255,.08); }
+.search-item-code { font-size: 16px; font-weight: 700; width: 48px; }
+.search-item-city { font-size: 13px; color: rgba(255,255,255,.6); }
+.search-item-region { font-size: 11px; color: rgba(255,255,255,.3); margin-left: auto; }
+.selected-airport-display { background: rgba(255,99,72,.1); border: 1px solid rgba(255,99,72,.3); border-radius: 10px; padding: 12px; margin-top: 8px; display: none; }
+.selected-airport-display.show { display: flex; align-items: center; gap: 12px; }
+.selected-airport-code { font-size: 20px; font-weight: 800; color: #ff6348; }
+.selected-airport-city { font-size: 13px; color: rgba(255,255,255,.6); }
+.selected-airport-change { margin-left: auto; color: rgba(255,255,255,.4); font-size: 12px; cursor: pointer; }
+
+/* ===== 拼团页 ===== */
+.group-header { text-align: center; padding: 40px 0 24px; }
+.group-icon { font-size: 64px; margin-bottom: 16px; }
+.group-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+.group-subtitle { font-size: 14px; color: rgba(255,255,255,.5); }
+.member-list { margin: 20px 0; }
+.member-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: rgba(255,255,255,.04); border-radius: 14px; margin-bottom: 8px; }
+.member-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #ff6b6b, #ffd93d); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; }
+.member-info { flex: 1; }
+.member-name { font-size: 14px; font-weight: 600; }
+.member-detail { font-size: 12px; color: rgba(255,255,255,.4); }
+.member-status { font-size: 12px; padding: 4px 10px; border-radius: 8px; font-weight: 600; }
+.status-paid { background: rgba(107,203,119,.15); color: #6bcb77; }
+.status-waiting { background: rgba(255,217,61,.15); color: #ffd93d; }
+.status-you { background: rgba(255,107,107,.15); color: #ff6b6b; }
+
+.invite-link-box { background: rgba(255,255,255,.06); border-radius: 14px; padding: 16px; margin: 16px 0; display: flex; align-items: center; gap: 12px; }
+.invite-link-text { flex: 1; font-size: 13px; color: rgba(255,255,255,.5); word-break: break-all; }
+.copy-btn { padding: 8px 14px; background: rgba(255,255,255,.1); border: none; border-radius: 8px; color: #fff; font-size: 13px; cursor: pointer; white-space: nowrap; }
+
+.progress-bar { height: 6px; background: rgba(255,255,255,.08); border-radius: 3px; margin: 16px 0; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #6bcb77, #4d96ff); border-radius: 3px; transition: width .6s ease; }
+
+/* ===== 地图 ===== */
+.map-container { width: 100%; max-width: 400px; margin: 0 auto; position: relative; }
+.map-svg { width: 100%; height: auto; }
+.map-state { fill: rgba(255,255,255,.08); stroke: rgba(255,255,255,.15); stroke-width: 0.5; transition: fill .3s; }
+.destination-dot { cursor: pointer; transition: transform .2s; }
+.destination-label { font-size: 8px; fill: rgba(255,255,255,.5); pointer-events: none; }
+
+.reveal-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; text-align: center; }
+.reveal-map-box { width: 100%; max-width: 380px; margin-bottom: 32px; position: relative; }
+.reveal-destination { margin-top: 20px; opacity: 0; transition: opacity .5s; }
+.reveal-destination.show { opacity: 1; }
+.reveal-dest-code { font-size: 48px; font-weight: 900; color: #ffd93d; }
+.reveal-dest-city { font-size: 16px; color: rgba(255,255,255,.6); margin-top: 4px; }
+
+@keyframes confetti-fall { 0% { transform: translateY(-10vh) rotate(0); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+.confetti { position: fixed; width: 8px; height: 8px; border-radius: 2px; top: 0; animation: confetti-fall 2.5s ease-in forwards; pointer-events: none; z-index: 100; }
+
+/* ===== 结果页 ===== */
+.result-card { background: linear-gradient(145deg, #1a1a3e, #2a2a5e); border: 1px solid rgba(255,255,255,.1); border-radius: 20px; padding: 24px; margin: 16px 0; }
+.result-route { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 20px; }
+.result-airport { font-size: 28px; font-weight: 900; }
+.result-arrow { font-size: 20px; color: rgba(255,255,255,.3); }
+.result-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.result-item { background: rgba(255,255,255,.04); border-radius: 12px; padding: 12px; }
+.result-item-label { font-size: 11px; color: rgba(255,255,255,.35); margin-bottom: 4px; }
+.result-item-value { font-size: 14px; font-weight: 600; }
+.tax-highlight { color: #ffd93d; }
+.group-members-result { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.08); }
+.group-member-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 13px; }
+.group-member-dot { width: 8px; height: 8px; border-radius: 50%; }
+.group-member-name { flex: 1; color: rgba(255,255,255,.6); }
+.group-member-route { color: rgba(255,255,255,.4); font-size: 12px; }
+
+/* ===== 选项页 ===== */
+.option-cards { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+.option-card { background: rgba(255,255,255,.05); border: 2px solid rgba(255,255,255,.08); border-radius: 16px; padding: 20px; cursor: pointer; transition: all .2s; }
+.option-card:active { transform: scale(.98); }
+.option-card.option-a { border-color: rgba(107,203,119,.3); }
+.option-card.option-b { border-color: rgba(168,85,247,.3); }
+.option-card.option-c { border-color: rgba(255,217,61,.3); }
+.option-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.option-desc { font-size: 13px; color: rgba(255,255,255,.45); line-height: 1.5; }
+
+/* ===== 确认页 ===== */
+.confirm-card { background: linear-gradient(145deg, #1a3e1a, #1a3e2a); border: 1px solid rgba(107,203,119,.2); border-radius: 20px; padding: 24px; text-align: center; margin: 24px 0; }
+.confirm-icon { font-size: 56px; margin-bottom: 12px; }
+.confirm-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+.confirm-desc { font-size: 14px; color: rgba(255,255,255,.5); line-height: 1.6; }
+
+/* ===== Re-roll ===== */
+.reroll-progress { background: rgba(255,255,255,.06); border-radius: 16px; padding: 20px; margin: 16px 0; text-align: center; }
+.reroll-count { font-size: 48px; font-weight: 900; color: #a855f7; }
+.reroll-target { font-size: 14px; color: rgba(255,255,255,.4); margin-top: 4px; }
+.reroll-link-box { background: rgba(168,85,247,.08); border: 1px dashed rgba(168,85,247,.4); border-radius: 14px; padding: 16px; margin: 16px 0; display: flex; align-items: center; gap: 12px; }
+.reroll-link-text { flex: 1; font-size: 12px; color: rgba(255,255,255,.4); word-break: break-all; }
+
+/* ===== 代金券 ===== */
+.voucher-card { background: linear-gradient(145deg, #3e3a1a, #3e351a); border: 2px solid rgba(255,217,61,.2); border-radius: 20px; padding: 32px 24px; text-align: center; margin: 24px 0; position: relative; overflow: hidden; }
+.voucher-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #ffd93d, #f9ca24); }
+.voucher-amount { font-size: 52px; font-weight: 900; color: #ffd93d; margin: 16px 0 8px; }
+.voucher-amount span { font-size: 24px; }
+.voucher-label { font-size: 14px; color: rgba(255,255,255,.5); }
+.voucher-expiry { font-size: 12px; color: rgba(255,255,255,.3); margin-top: 12px; }
+
+/* ===== Toast ===== */
+.toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(255,255,255,.95); color: #1a1a2e; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 200; opacity: 0; transition: all .3s; pointer-events: none; box-shadow: 0 8px 30px rgba(0,0,0,.3); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ===== 底部说明 ===== */
+.terms { font-size: 11px; color: rgba(255,255,255,.2); text-align: center; margin-top: 24px; line-height: 1.6; }
+
+/* ===== 倒计时 ===== */
+.countdown { font-size: 13px; color: rgba(255,255,255,.35); text-align: center; margin: 8px 0; }
+.countdown span { color: #ff6348; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- 语言切换 -->
+<div class="lang-switch">
+  <button class="lang-btn active" data-lang="zh" onclick="setLanguage('zh')">中文</button>
+  <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">EN</button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ======== 第1页：首页 ======== -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="logo">HopeGoo</div>
+    <div class="tagline" data-i18n="home.tagline"></div>
+    <div class="blind-box-visual" onclick="goPage('page-mode')">
+      <div class="box-lid"><div class="box-ribbon"></div></div>
+      <div class="box-body"></div>
+    </div>
+    <div class="price-tag">$29.99 <span data-i18n="home.perBox"></span></div>
+    <div class="original-price" data-i18n="home.marketPrice"></div>
+
+    <!-- 规则说明 -->
+    <div class="rules-section">
+      <div class="rules-title" data-i18n="home.rulesTitle"></div>
+      <ul class="rules-list" id="rules-list"></ul>
+    </div>
+
+    <!-- 出发地列表 -->
+    <div class="departure-section">
+      <div class="departure-title" data-i18n="home.departureTitle"></div>
+      <div class="departure-grid" id="departure-grid"></div>
+    </div>
+  </div>
+  <div class="btn-stack">
+    <button class="btn btn-primary" onclick="goPage('page-mode')" data-i18n="home.buyBtn"></button>
+  </div>
+  <div class="terms" data-i18n="home.terms"></div>
+</div>
+
+<!-- ======== 第2页：模式选择 ======== -->
+<div class="page" id="page-mode">
+  <div class="top-bar">
+    <button class="back-btn" onclick="goPage('page-home')">←</button>
+    <div class="top-title" data-i18n="mode.title"></div>
+  </div>
+  <div class="mode-cards">
+    <div class="mode-card selected" onclick="selectMode(this, 'solo')">
+      <div class="mode-icon">🎒</div>
+      <div class="mode-name" data-i18n="mode.soloTitle"></div>
+      <div class="mode-desc" data-i18n="mode.soloDesc"></div>
+    </div>
+    <div class="mode-card" onclick="selectMode(this, 'group')">
+      <div class="mode-icon">👯</div>
+      <div class="mode-name"><span data-i18n="mode.groupTitle"></span> <span class="mode-badge" data-i18n="mode.groupBadge"></span></div>
+      <div class="mode-desc" data-i18n="mode.groupDesc"></div>
+    </div>
+  </div>
+  <div class="btn-stack">
+    <button class="btn btn-primary" onclick="nextFromMode()" data-i18n="common.next"></button>
+  </div>
+</div>
+
+<!-- ======== 第3页：填写信息（单人） ======== -->
+<div class="page" id="page-form-solo">
+  <div class="top-bar">
+    <button class="back-btn" onclick="goPage('page-mode')">←</button>
+    <div class="top-title" data-i18n="form.title"></div>
+  </div>
+  <div class="form-section">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" data-i18n="form.firstName"></label>
+        <input class="form-input" id="solo-firstname" data-i18n-placeholder="form.firstNamePH">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="form.lastName"></label>
+        <input class="form-input" id="solo-lastname" data-i18n-placeholder="form.lastNamePH">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-i18n="form.birthday"></label>
+      <input class="form-input" id="solo-birthday" type="date">
+      <div class="form-hint" data-i18n="form.dateFormat"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-i18n="form.departure"></label>
+      <div class="search-container">
+        <input class="form-input" id="solo-airport-search" data-i18n-placeholder="form.searchPH" oninput="filterAirports('solo')" onfocus="showAirportResults('solo')">
+        <div class="search-results" id="solo-airport-results"></div>
+      </div>
+      <div class="selected-airport-display" id="solo-selected-airport">
+        <span class="selected-airport-code" id="solo-selected-code"></span>
+        <span class="selected-airport-city" id="solo-selected-city"></span>
+        <span class="selected-airport-change" data-i18n="form.change" onclick="clearAirport('solo')"></span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-i18n="form.departureDate"></label>
+      <input class="form-input" id="solo-date" type="date">
+      <div class="form-hint" data-i18n="form.dateHint"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-i18n="form.passport"></label>
+      <input class="form-input" id="solo-passport" data-i18n-placeholder="form.passportPH">
+      <div class="form-hint" data-i18n="form.passportHint"></div>
+    </div>
+  </div>
+  <div class="btn-stack">
+    <button class="btn btn-primary" onclick="submitSoloForm()" data-i18n="form.payAndOpen"></button>
+  </div>
+</div>
+
+<!-- ======== 第4页：填写信息（拼团） ======== -->
+<div class="page" id="page-form-group">
+  <div class="top-bar">
+    <button class="back-btn" onclick="goPage('page-mode')">←</button>
+    <div class="top-title" data-i18n="group.createTitle"></div>
+  </div>
+  <div class="form-section">
+    <div class="form-group">
+      <label class="form-label" data-i18n="group.expectedSize"></label>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-sm btn-secondary group-size-btn" onclick="pickGroupSize(this,2)">2</button>
+        <button class="btn btn-sm btn-secondary group-size-btn" onclick="pickGroupSize(this,3)">3</button>
+        <button class="btn btn-sm btn-secondary group-size-btn selected" onclick="pickGroupSize(this,4)" style="border-color:#ff6348;background:rgba(255,99,72,.15);">4</button>
+        <button class="btn btn-sm btn-secondary group-size-btn" onclick="pickGroupSize(this,5)">5</button>
+      </div>
+      <div class="form-hint" data-i18n="group.sizeHint"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" data-i18n="form.firstName"></label>
+        <input class="form-input" id="group-firstname" data-i18n-placeholder="form.firstNamePH">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="form.lastName"></label>
+        <input class="form-input" id="group-lastname" data-i18n-placeholder="form.lastNamePH">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-i18n="form.birthday"></label>
+      <input class="form-input" id="group-birthday" type="date">
+      <div class="form-hint" data-i18n="form.dateFormat"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-i18n="form.departure"></label>
+      <div class="search-container">
+        <input class="form-input" id="group-airport-search" data-i18n-placeholder="form.searchPH" oninput="filterAirports('group')" onfocus="showAirportResults('group')">
+        <div class="search-results" id="group-airport-results"></div>
+      </div>
+      <div class="selected-airport-display" id="group-selected-airport">
+        <span class="selected-airport-code" id="group-selected-code"></span>
+        <span class="selected-airport-city" id="group-selected-city"></span>
+        <span class="selected-airport-change" data-i18n="form.change" onclick="clearAirport('group')"></span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-i18n="form.departureDate"></label>
+      <input class="form-input" id="group-date" type="date">
+      <div class="form-hint" data-i18n="form.dateHint"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-i18n="form.passport"></label>
+      <input class="form-input" id="group-passport" data-i18n-placeholder="form.passportPH">
+    </div>
+  </div>
+  <div class="btn-stack">
+    <button class="btn btn-group" onclick="submitGroupForm()" data-i18n="group.createBtn"></button>
+  </div>
+</div>
+
+<!-- ======== 第5页：拼团等待 ======== -->
+<div class="page" id="page-group-wait">
+  <div class="top-bar">
+    <div class="top-title" data-i18n="group.waitTitle"></div>
+  </div>
+  <div class="group-header">
+    <div class="group-icon">👯</div>
+    <div class="group-title" data-i18n="group.waiting"></div>
+    <div class="group-subtitle" id="group-progress-text">1/4</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="group-progress-bar" style="width:25%"></div></div>
+  <div class="countdown"><span data-i18n="group.validTime"></span> <span id="group-timer">24:00:00</span></div>
+
+  <div class="member-list" id="member-list"></div>
+
+  <div class="invite-link-box">
+    <div class="invite-link-text">https://hopegoo.com/blindbox/join/a8k3m...</div>
+    <button class="copy-btn" onclick="copyLink()" data-i18n="group.copy"></button>
+  </div>
+
+  <div class="btn-stack">
+    <button class="btn btn-group" id="btn-open-group" onclick="openGroupBox()" disabled data-i18n="group.canOpen"></button>
+  </div>
+  <div style="text-align:center;margin-top:8px;">
+    <button class="btn btn-sm btn-secondary" onclick="simulateMemberJoin()" style="display:inline-block;width:auto;" data-i18n="group.simulate"></button>
+  </div>
+</div>
+
+<!-- ======== 第6页：开盒动画（地图飞镖） ======== -->
+<div class="page" id="page-reveal">
+  <div class="top-bar">
+    <div class="top-title" data-i18n="reveal.title"></div>
+  </div>
+  <div class="reveal-container">
+    <div class="reveal-map-box">
+      <svg id="us-map" viewBox="0 0 960 600" class="map-svg">
+        <path class="map-state" d="M140,310 L180,280 L220,290 L260,270 L300,280 L340,260 L380,270 L420,250 L460,260 L500,240 L540,250 L580,230 L620,240 L660,220 L700,230 L740,210 L780,220 L820,200 L820,350 L780,340 L740,360 L700,350 L660,370 L620,360 L580,380 L540,370 L500,390 L460,380 L420,400 L380,390 L340,410 L300,400 L260,420 L220,410 L180,430 L140,420 Z" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.15)"/>
+        <g id="destination-dots"></g>
+        <g id="dart-marker">
+          <circle r="12" fill="#ff6348" opacity=".3">
+            <animate attributeName="r" values="12;20;12" dur="1s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values=".3;.1;.3" dur="1s" repeatCount="indefinite"/>
+          </circle>
+          <circle r="6" fill="#ff6348"/>
+          <text y="-15" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">🎯</text>
+        </g>
+      </svg>
+    </div>
+    <div id="reveal-label" style="font-size:16px;color:rgba(255,255,255,.5);" data-i18n="reveal.clickToStart"></div>
+    <div class="reveal-destination" id="reveal-destination">
+      <div class="reveal-dest-code" id="reveal-code">MIA</div>
+      <div class="reveal-dest-city" id="reveal-city">🏖️ Miami</div>
+    </div>
+  </div>
+  <div class="btn-stack" id="reveal-next-btn" style="display:none;">
+    <button class="btn btn-primary" onclick="showResult()" data-i18n="reveal.viewDetail"></button>
+  </div>
+</div>
+
+<!-- ======== 第7页：结果+选项 ======== -->
+<div class="page" id="page-result">
+  <div class="top-bar">
+    <div class="top-title" data-i18n="result.title"></div>
+  </div>
+
+  <div class="result-card" id="result-card"></div>
+
+  <div class="option-cards">
+    <div class="option-card option-a" onclick="chooseOption('a')">
+      <div class="option-title" data-i18n="option.a.title"></div>
+      <div class="option-desc" id="option-a-desc"></div>
+    </div>
+    <div class="option-card option-b" onclick="chooseOption('b')">
+      <div class="option-title" data-i18n="option.b.title"></div>
+      <div class="option-desc" id="option-b-desc"></div>
+    </div>
+    <div class="option-card option-c" onclick="chooseOption('c')">
+      <div class="option-title" data-i18n="option.c.title"></div>
+      <div class="option-desc" data-i18n="option.c.desc"></div>
+    </div>
+  </div>
+  <div class="countdown" id="result-countdown"></div>
+</div>
+
+<!-- ======== 第8页：确认兑换 ======== -->
+<div class="page" id="page-confirm-a">
+  <div class="top-bar">
+    <div class="top-title" data-i18n="confirm.title"></div>
+  </div>
+  <div class="confirm-card">
+    <div class="confirm-icon">🎉</div>
+    <div class="confirm-title" data-i18n="confirm.success"></div>
+    <div class="confirm-desc" id="confirm-a-detail"></div>
+  </div>
+  <div class="btn-stack">
+    <button class="btn btn-primary" onclick="goPage('page-home')" data-i18n="confirm.backHome"></button>
+  </div>
+</div>
+
+<!-- ======== 第9页：Re-roll ======== -->
+<div class="page" id="page-reroll">
+  <div class="top-bar">
+    <button class="back-btn" onclick="goPage('page-result')">←</button>
+    <div class="top-title" data-i18n="reroll.title"></div>
+  </div>
+  <div style="text-align:center;padding:20px 0;">
+    <div style="font-size:48px;">🔄</div>
+    <div style="font-size:18px;font-weight:700;margin-top:12px;" data-i18n="reroll.inviteTitle"></div>
+    <div style="font-size:13px;color:rgba(255,255,255,.4);margin-top:8px;" id="reroll-rule-text"></div>
+  </div>
+  <div class="reroll-progress">
+    <div class="reroll-count" id="reroll-current">0</div>
+    <div class="reroll-target" id="reroll-target-text"></div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="reroll-progress-bar" style="width:0%"></div></div>
+  <div class="reroll-link-box">
+    <div class="reroll-link-text">https://hopegoo.com/blindbox/reroll/k9m2x...</div>
+    <button class="copy-btn" onclick="copyLink()" data-i18n="group.copy"></button>
+  </div>
+  <div style="text-align:center;margin-top:8px;">
+    <button class="btn btn-sm btn-reroll" onclick="simulateRerollInvite()" style="display:inline-block;width:auto;" data-i18n="reroll.simulate"></button>
+  </div>
+  <div class="btn-stack">
+    <button class="btn btn-reroll" id="btn-do-reroll" disabled data-i18n="reroll.incomplete"></button>
+    <button class="btn btn-secondary" onclick="goPage('page-result')" data-i18n="common.back"></button>
+  </div>
+  <div style="font-size:11px;color:rgba(255,255,255,.25);text-align:center;margin-top:12px;" id="reroll-remaining-text"></div>
+</div>
+
+<!-- ======== 第10页：代金券 ======== -->
+<div class="page" id="page-voucher">
+  <div class="top-bar">
+    <div class="top-title" data-i18n="voucher.title"></div>
+  </div>
+  <div class="voucher-card">
+    <div style="font-size:13px;color:rgba(255,255,255,.4);" data-i18n="voucher.label"></div>
+    <div class="voucher-amount">$<span>39</span>.99</div>
+    <div class="voucher-label" data-i18n="voucher.usage"></div>
+    <div class="voucher-expiry" data-i18n="voucher.expiry"></div>
+  </div>
+  <div class="btn-stack">
+    <button class="btn btn-primary" onclick="goPage('page-home')" data-i18n="confirm.backHome"></button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// i18n 多语言模块
+// ============================================================
+const i18n = {
+  currentLang: 'zh',
+
+  // ===== 中文 =====
+  zh: {
+    // 首页
+    'home.tagline': '✈️ 机票盲盒 · 未知目的地 · 超低价格',
+    'home.perBox': '/个',
+    'home.marketPrice': '机票市场价 $80-$300',
+    'home.rulesTitle': '📋 盲盒规则',
+    'home.rules': [
+      '购买后随机获得一张飞往美国境内目的地的机票',
+      '确认兑换时需支付实际税费（最高不超过票面价值的 <span class="rules-highlight">20%</span>，拼团享 <span class="rules-highlight">8折</span> 优惠）',
+      '对目的地不满意？邀请好友注册即可 <span class="rules-highlight">Re-roll</span> 重新抽取',
+      '放弃兑换可获得 <span class="rules-highlight">$39.99</span> 代金券（180天有效）<span class="rules-tag">比购买价多$10</span>',
+      '每期限量 500 个，每人限购 3 个'
+    ],
+    'home.departureTitle': '🗺️ 支持的出发机场（12个热门城市）',
+    'home.buyBtn': '立即购买',
+    'home.terms': '购买即代表同意《HopeGoo盲盒用户协议》',
+
+    // 模式选择
+    'mode.title': '选择模式',
+    'mode.soloTitle': '单人模式',
+    'mode.soloDesc': '独自购买，独立开箱<br>不满意可 Re-roll 或换代金券',
+    'mode.groupTitle': '拼团模式',
+    'mode.groupBadge': '税费8折',
+    'mode.groupDesc': '2-5人拼团，共享目的地<br>出发机场和日期各人独立',
+
+    // 表单
+    'form.title': '填写信息',
+    'form.firstName': '名 (First Name) *',
+    'form.firstNamePH': '如: John',
+    'form.lastName': '姓 (Last Name) *',
+    'form.lastNamePH': '如: Smith',
+    'form.birthday': '乘机人生日 *',
+    'form.departure': '出发机场 *',
+    'form.searchPH': '输入城市或机场代码搜索...',
+    'form.change': '更换',
+    'form.departureDate': '出发日期 *',
+    'form.dateHint': '需在购买当日起14天之后',
+    'form.dateFormat': '格式：年-月-日 (YYYY-MM-DD)',
+    'form.passport': '护照号（选填）',
+    'form.passportPH': '填写后可抽中国际目的地',
+    'form.passportHint': '未填写则仅匹配美国国内航班',
+    'form.payAndOpen': '支付 $29.99 并开盒',
+
+    // 拼团
+    'group.createTitle': '发起拼团',
+    'group.expectedSize': '期望人数',
+    'group.sizeHint': '非强制满员，团员都支付后团长即可开盒',
+    'group.createBtn': '支付 $29.99 并创建拼团',
+    'group.waitTitle': '拼团进行中',
+    'group.waiting': '等待好友加入',
+    'group.validTime': '拼团有效时间',
+    'group.copy': '复制',
+    'group.canOpen': '全员支付后可开盒',
+    'group.simulate': '🎯 模拟好友加入（Demo）',
+    'group.paid': '已支付',
+    'group.waitPay': '待支付',
+    'group.leader': '团长 · 已支付',
+    'group.waitJoin': '等待加入',
+    'group.progress': '{paid}/{total} 人已支付',
+    'group.canOpenBtn': '{paid}人已支付，立即开盒',
+    'group.fullOpenBtn': '满员！立即开盒 🎉',
+
+    // 开盒
+    'reveal.title': '🎯 随机目的地',
+    'reveal.clickToStart': '点击地图开始抽取',
+    'reveal.drawing': '正在抽取...',
+    'reveal.viewDetail': '查看详情',
+
+    // 结果
+    'result.title': '盲盒结果',
+    'result.destination': '目的地',
+    'result.departureDate': '出发日期',
+    'result.flight': '航班',
+    'result.time': '时间',
+    'result.marketPrice': '市场价',
+    'result.tax': '税费',
+    'result.groupMembers': '拼团成员',
+    'result.countdown': '请在 <span>24小时</span> 内做出选择，超时将自动兑换 $29.99 代金券',
+
+    // 选项
+    'option.a.title': '✅ 选项A：确认兑换机票',
+    'option.a.desc': '支付实际税费 $${tax}（最高不超过票面价值的${rate}）即可获得该机票',
+    'option.a.descGroup': '支付实际税费 $${tax}（拼团享8折优惠）即可获得该机票',
+    'option.b.title': '🔄 选项B：Re-roll 重抽',
+    'option.b.desc': '邀请 2 位新用户注册，获得重新抽取目的地的机会',
+    'option.b.descGroup': '团长分享链接，邀请 {n} 位新用户注册，全团目的地重新抽取',
+    'option.c.title': '🎫 选项C：兑换代金券',
+    'option.c.desc': '获得 $39.99 HopeGoo 代金券，可用于平台所有旅游产品',
+
+    // 确认
+    'confirm.title': '确认兑换',
+    'confirm.success': '机票兑换成功！',
+    'confirm.detail': '已支付税费 <span style="color:#ffd93d;font-weight:700;">$${tax}</span><br><br>航班信息已发送至您的 HopeGoo 账户<br>请在 App 中查看电子客票',
+    'confirm.backHome': '返回首页',
+
+    // Re-roll
+    'reroll.title': 'Re-roll 重抽',
+    'reroll.inviteTitle': '邀请好友助力重抽',
+    'reroll.ruleText': '分享链接，邀请 {n} 位新用户注册后可重新抽取目的地',
+    'reroll.ruleTextGroup': '团长分享链接，邀请 {n} 位新用户注册后，全团目的地将重新抽取',
+    'reroll.newUsers': '/ {n} 位新用户',
+    'reroll.simulate': '🎯 模拟好友注册（Demo）',
+    'reroll.incomplete': '邀请未完成',
+    'reroll.doReroll': '🔄 立即 Re-roll',
+    'reroll.remaining': '剩余 Re-roll 次数：{n} 次',
+
+    // 代金券
+    'voucher.title': '代金券',
+    'voucher.label': 'HopeGoo 旅游代金券',
+    'voucher.usage': '可用于平台所有旅游产品',
+    'voucher.expiry': '有效期 180 天 · 不可叠加 · 不可提现',
+
+    // 通用
+    'common.next': '下一步',
+    'common.back': '返回',
+
+    // Toast
+    'toast.linkCopied': '✅ 链接已复制到剪贴板',
+    'toast.fillFirstName': '请填写名 (First Name)',
+    'toast.fillLastName': '请填写姓 (Last Name)',
+    'toast.selectBirthday': '请选择乘机人生日',
+    'toast.selectAirport': '请选择出发机场',
+    'toast.selectDate': '请选择出发日期',
+    'toast.groupFull': '已满员',
+    'toast.noMoreMembers': '已无更多模拟成员',
+    'toast.memberJoined': '🎉 {name} 已加入并支付！',
+    'toast.rerollComplete': '🎉 邀请完成！可以 Re-roll 了',
+    'toast.rerollProgress': '👍 +1 新用户注册（{current}/{total}）',
+    'toast.rerollSuccess': '🔄 Re-roll 成功！新目的地已生成',
+    'toast.rerollUsedUp': '已用完 Re-roll 次数',
+
+    // 搜索结果
+    'search.noResult': '未找到匹配的机场',
+  },
+
+  // ===== 英文 =====
+  en: {
+    // Home
+    'home.tagline': '✈️ Flight Mystery Box · Unknown Destination · Ultra Low Price',
+    'home.perBox': '/box',
+    'home.marketPrice': 'Market price $80-$300',
+    'home.rulesTitle': '📋 How It Works',
+    'home.rules': [
+      'Get a random flight to a destination within the US',
+      'Pay actual airline taxes when redeeming (max <span class="rules-highlight">20%</span> of ticket value, <span class="rules-highlight">20% off</span> for groups)',
+      'Not satisfied? Invite friends to <span class="rules-highlight">Re-roll</span> for a new destination',
+      'Exchange for a <span class="rules-highlight">$39.99</span> voucher (180 days valid) <span class="rules-tag">$10 bonus</span>',
+      'Limited to 500 boxes per round, max 3 per person'
+    ],
+    'home.departureTitle': '🗺️ Supported Departure Airports (12 Major Cities)',
+    'home.buyBtn': 'Buy Now',
+    'home.terms': 'By purchasing, you agree to HopeGoo Mystery Box Terms of Service',
+
+    // Mode Selection
+    'mode.title': 'Choose Mode',
+    'mode.soloTitle': 'Solo Mode',
+    'mode.soloDesc': 'Buy alone, open independently<br>Re-roll or exchange for voucher if unsatisfied',
+    'mode.groupTitle': 'Group Mode',
+    'mode.groupBadge': '20% Tax Off',
+    'mode.groupDesc': '2-5 people, same destination<br>Each person chooses their own departure',
+
+    // Form
+    'form.title': 'Enter Details',
+    'form.firstName': 'First Name *',
+    'form.firstNamePH': 'e.g. John',
+    'form.lastName': 'Last Name *',
+    'form.lastNamePH': 'e.g. Smith',
+    'form.birthday': 'Date of Birth *',
+    'form.departure': 'Departure Airport *',
+    'form.searchPH': 'Search by city or airport code...',
+    'form.change': 'Change',
+    'form.departureDate': 'Departure Date *',
+    'form.dateHint': 'Must be at least 14 days from today',
+    'form.dateFormat': 'Format: YYYY-MM-DD',
+    'form.passport': 'Passport Number (Optional)',
+    'form.passportPH': 'Enter for international destinations',
+    'form.passportHint': 'Without passport, only US domestic flights',
+    'form.payAndOpen': 'Pay $29.99 & Open Box',
+
+    // Group
+    'group.createTitle': 'Create Group',
+    'group.expectedSize': 'Expected Size',
+    'group.sizeHint': 'Not required to be full. Leader can open once all members paid',
+    'group.createBtn': 'Pay $29.99 & Create Group',
+    'group.waitTitle': 'Group in Progress',
+    'group.waiting': 'Waiting for Friends',
+    'group.validTime': 'Time remaining',
+    'group.copy': 'Copy',
+    'group.canOpen': 'Open box when all members paid',
+    'group.simulate': '🎯 Simulate Member Join (Demo)',
+    'group.paid': 'Paid',
+    'group.waitPay': 'Waiting',
+    'group.leader': 'Leader · Paid',
+    'group.waitJoin': 'Waiting to join',
+    'group.progress': '{paid}/{total} members paid',
+    'group.canOpenBtn': '{paid} paid, open now',
+    'group.fullOpenBtn': 'Full! Open Now 🎉',
+
+    // Reveal
+    'reveal.title': '🎯 Random Destination',
+    'reveal.clickToStart': 'Tap the map to start',
+    'reveal.drawing': 'Drawing...',
+    'reveal.viewDetail': 'View Details',
+
+    // Result
+    'result.title': 'Your Result',
+    'result.destination': 'Destination',
+    'result.departureDate': 'Date',
+    'result.flight': 'Flight',
+    'result.time': 'Time',
+    'result.marketPrice': 'Market Price',
+    'result.tax': 'Taxes',
+    'result.groupMembers': 'Group Members',
+    'result.countdown': 'Make your choice within <span>24 hours</span>, or auto-convert to $29.99 voucher',
+
+    // Options
+    'option.a.title': '✅ Option A: Confirm & Redeem',
+    'option.a.desc': 'Pay airline taxes $${tax} (max ${rate} of ticket value) to get this flight',
+    'option.a.descGroup': 'Pay airline taxes $${tax} (group gets 20% off) to get this flight',
+    'option.b.title': '🔄 Option B: Re-roll',
+    'option.b.desc': 'Invite 2 new users to re-draw destination',
+    'option.b.descGroup': 'Leader shares link, invite {n} new users to re-draw for entire group',
+    'option.c.title': '🎫 Option C: Get Voucher',
+    'option.c.desc': 'Exchange for $39.99 HopeGoo voucher, valid for all products',
+
+    // Confirm
+    'confirm.title': 'Confirmation',
+    'confirm.success': 'Flight Redeemed!',
+    'confirm.detail': 'Taxes paid: <span style="color:#ffd93d;font-weight:700;">$${tax}</span><br><br>Flight details sent to your HopeGoo account<br>Check your e-ticket in the app',
+    'confirm.backHome': 'Back to Home',
+
+    // Re-roll
+    'reroll.title': 'Re-roll',
+    'reroll.inviteTitle': 'Invite Friends to Re-roll',
+    'reroll.ruleText': 'Share link, invite {n} new users to re-draw destination',
+    'reroll.ruleTextGroup': 'Leader shares link, invite {n} new users to re-draw for entire group',
+    'reroll.newUsers': '/ {n} new users',
+    'reroll.simulate': '🎯 Simulate Invite (Demo)',
+    'reroll.incomplete': 'Invite incomplete',
+    'reroll.doReroll': '🔄 Re-roll Now',
+    'reroll.remaining': 'Re-roll attempts left: {n}',
+
+    // Voucher
+    'voucher.title': 'Voucher',
+    'voucher.label': 'HopeGoo Travel Voucher',
+    'voucher.usage': 'Valid for all HopeGoo products',
+    'voucher.expiry': 'Valid for 180 days · Non-stackable · Non-refundable',
+
+    // Common
+    'common.next': 'Next',
+    'common.back': 'Back',
+
+    // Toast
+    'toast.linkCopied': '✅ Link copied to clipboard',
+    'toast.fillFirstName': 'Please enter First Name',
+    'toast.fillLastName': 'Please enter Last Name',
+    'toast.selectBirthday': 'Please select date of birth',
+    'toast.selectAirport': 'Please select departure airport',
+    'toast.selectDate': 'Please select departure date',
+    'toast.groupFull': 'Group is full',
+    'toast.noMoreMembers': 'No more demo members available',
+    'toast.memberJoined': '🎉 {name} joined and paid!',
+    'toast.rerollComplete': '🎉 Invite complete! Ready to Re-roll',
+    'toast.rerollProgress': '👍 +1 new user registered ({current}/{total})',
+    'toast.rerollSuccess': '🔄 Re-roll successful! New destination generated',
+    'toast.rerollUsedUp': 'No Re-roll attempts left',
+
+    // Search
+    'search.noResult': 'No matching airports found',
+  },
+
+  // ===== 获取文本 =====
+  get(key, vars = {}) {
+    let text = this[this.currentLang]?.[key] || this.zh[key] || key;
+    // 替换变量 {name} -> vars.name
+    Object.keys(vars).forEach(k => {
+      text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), vars[k]);
+    });
+    return text;
+  },
+
+  // ===== 应用语言 =====
+  apply() {
+    // 文本内容
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      el.textContent = this.get(key);
+    });
+
+    // placeholder
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      el.placeholder = this.get(key);
+    });
+
+    // 特殊处理：规则列表
+    const rulesList = document.getElementById('rules-list');
+    if (rulesList) {
+      const rules = this.get('home.rules');
+      rulesList.innerHTML = rules.map(r => `<li>${r}</li>`).join('');
+    }
+
+    // 特殊处理：出发地标签
+    renderDepartureGrid();
+
+    // 更新语言按钮状态
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === this.currentLang);
+    });
+
+    // 更新 html lang 属性
+    document.documentElement.lang = this.currentLang === 'zh' ? 'zh-CN' : 'en';
+  }
+};
+
+// ============================================================
+// 切换语言
+// ============================================================
+function setLanguage(lang) {
+  i18n.currentLang = lang;
+  i18n.apply();
+  showToast(lang === 'zh' ? '已切换为中文' : 'Switched to English');
+}
+
+// ============================================================
+// 状态管理
+// ============================================================
+const state = {
+  mode: 'solo',
+  groupSize: 4,
+  selectedAirport: { solo: null, group: null },
+  destination: null,
+  rerollCount: 0,
+  maxReroll: 2,
+  rerollInvited: 0,
+  rerollNeeded: 2,
+  groupMembers: [],
+};
+
+// ============================================================
+// 目的地池（含地图坐标）
+// ============================================================
+const destinations = [
+  { code: 'MIA', cityZh: '迈阿密', cityEn: 'Miami', emoji: '🏖️', x: 780, y: 480 },
+  { code: 'CUN', cityZh: '坎昆', cityEn: 'Cancun', emoji: '🌴', x: 420, y: 520 },
+  { code: 'LAS', cityZh: '拉斯维加斯', cityEn: 'Las Vegas', emoji: '🎰', x: 220, y: 340 },
+  { code: 'NYC', cityZh: '纽约', cityEn: 'New York', emoji: '🗽', x: 820, y: 220 },
+  { code: 'LAX', cityZh: '洛杉矶', cityEn: 'Los Angeles', emoji: '🎬', x: 160, y: 380 },
+  { code: 'HNL', cityZh: '夏威夷檀香山', cityEn: 'Honolulu', emoji: '🌺', x: 140, y: 520 },
+  { code: 'SFO', cityZh: '旧金山', cityEn: 'San Francisco', emoji: '🌉', x: 140, y: 320 },
+  { code: 'BOS', cityZh: '波士顿', cityEn: 'Boston', emoji: '🎓', x: 860, y: 200 },
+  { code: 'ORD', cityZh: '芝加哥', cityEn: 'Chicago', emoji: '🏙️', x: 580, y: 260 },
+  { code: 'SEA', cityZh: '西雅图', cityEn: 'Seattle', emoji: '☕', x: 140, y: 160 },
+  { code: 'MSY', cityZh: '新奥尔良', cityEn: 'New Orleans', emoji: '🎷', x: 580, y: 440 },
+  { code: 'DEN', cityZh: '丹佛', cityEn: 'Denver', emoji: '🏔️', x: 340, y: 310 },
+  { code: 'ATL', cityZh: '亚特兰大', cityEn: 'Atlanta', emoji: '🍑', x: 700, y: 380 },
+  { code: 'NAS', cityZh: '巴哈马拿骚', cityEn: 'Nassau', emoji: '🐚', x: 820, y: 480 },
+  { code: 'MBJ', cityZh: '牙买加蒙特哥贝', cityEn: 'Montego Bay', emoji: '🎶', x: 500, y: 540 },
+];
+
+// ============================================================
+// 机场数据
+// ============================================================
+const airports = [
+  { code: 'LAX', cityZh: '洛杉矶', cityEn: 'Los Angeles', regionZh: '西海岸', regionEn: 'West Coast' },
+  { code: 'SFO', cityZh: '旧金山', cityEn: 'San Francisco', regionZh: '西海岸', regionEn: 'West Coast' },
+  { code: 'SEA', cityZh: '西雅图', cityEn: 'Seattle', regionZh: '西海岸', regionEn: 'West Coast' },
+  { code: 'JFK', cityZh: '纽约', cityEn: 'New York', regionZh: '东海岸', regionEn: 'East Coast' },
+  { code: 'EWR', cityZh: '纽约纽瓦克', cityEn: 'Newark', regionZh: '东海岸', regionEn: 'East Coast' },
+  { code: 'BOS', cityZh: '波士顿', cityEn: 'Boston', regionZh: '东海岸', regionEn: 'East Coast' },
+  { code: 'MIA', cityZh: '迈阿密', cityEn: 'Miami', regionZh: '东海岸', regionEn: 'East Coast' },
+  { code: 'ORD', cityZh: '芝加哥', cityEn: 'Chicago', regionZh: '中部', regionEn: 'Central' },
+  { code: 'DFW', cityZh: '达拉斯', cityEn: 'Dallas', regionZh: '南部', regionEn: 'South' },
+  { code: 'DEN', cityZh: '丹佛', cityEn: 'Denver', regionZh: '中部', regionEn: 'Central' },
+  { code: 'ATL', cityZh: '亚特兰大', cityEn: 'Atlanta', regionZh: '南部', regionEn: 'South' },
+  { code: 'IAH', cityZh: '休斯顿', cityEn: 'Houston', regionZh: '南部', regionEn: 'South' },
+];
+
+const fakeNames = ['Alex', 'Jessica', 'Kevin', 'Emily', 'Ryan', 'Sophia'];
+const fakeAirports = ['JFK', 'SFO', 'ORD', 'LAX', 'SEA', 'BOS', 'ATL', 'DEN'];
+
+// ============================================================
+// 工具函数
+// ============================================================
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  if (id === 'page-reveal') initMap();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function copyLink() {
+  showToast(i18n.get('toast.linkCopied'));
+}
+
+function randomFrom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// ============================================================
+// 首页盲盒动画
+// ============================================================
+document.querySelector('.blind-box-visual').addEventListener('mouseenter', function() {
+  this.classList.add('opening');
+});
+document.querySelector('.blind-box-visual').addEventListener('mouseleave', function() {
+  this.classList.remove('opening');
+});
+
+// ============================================================
+// 出发地渲染
+// ============================================================
+function renderDepartureGrid() {
+  const grid = document.getElementById('departure-grid');
+  if (!grid) return;
+  grid.innerHTML = airports.map(ap => {
+    const city = i18n.currentLang === 'zh' ? ap.cityZh : ap.cityEn;
+    return `<span class="departure-tag"><span>${ap.code}</span> ${city}</span>`;
+  }).join('');
+}
+
+// ============================================================
+// 模式选择
+// ============================================================
+function selectMode(el, mode) {
+  document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.mode = mode;
+}
+
+function nextFromMode() {
+  if (state.mode === 'solo') {
+    goPage('page-form-solo');
+  } else {
+    goPage('page-form-group');
+  }
+}
+
+// ============================================================
+// 机场搜索
+// ============================================================
+function filterAirports(mode) {
+  const query = document.getElementById(`${mode}-airport-search`).value.toLowerCase();
+  const resultsContainer = document.getElementById(`${mode}-airport-results`);
+
+  const filtered = airports.filter(ap => {
+    const searchStr = `${ap.code} ${ap.cityZh} ${ap.cityEn} ${ap.regionZh} ${ap.regionEn}`.toLowerCase();
+    return searchStr.includes(query);
+  });
+
+  resultsContainer.innerHTML = filtered.length ? filtered.map(ap => {
+    const city = i18n.currentLang === 'zh' ? ap.cityZh : ap.cityEn;
+    const region = i18n.currentLang === 'zh' ? ap.regionZh : ap.regionEn;
+    return `<div class="search-item" onclick="selectAirport('${mode}', '${ap.code}', '${city}')">
+      <span class="search-item-code">${ap.code}</span>
+      <span class="search-item-city">${city}</span>
+      <span class="search-item-region">${region}</span>
+    </div>`;
+  }).join('') : `<div class="search-item" style="color:rgba(255,255,255,.3);">${i18n.get('search.noResult')}</div>`;
+
+  resultsContainer.classList.toggle('show', query.length > 0);
+}
+
+function showAirportResults(mode) {
+  const query = document.getElementById(`${mode}-airport-search`).value;
+  const resultsContainer = document.getElementById(`${mode}-airport-results`);
+  if (query.length === 0) {
+    resultsContainer.innerHTML = airports.map(ap => {
+      const city = i18n.currentLang === 'zh' ? ap.cityZh : ap.cityEn;
+      const region = i18n.currentLang === 'zh' ? ap.regionZh : ap.regionEn;
+      return `<div class="search-item" onclick="selectAirport('${mode}', '${ap.code}', '${city}')">
+        <span class="search-item-code">${ap.code}</span>
+        <span class="search-item-city">${city}</span>
+        <span class="search-item-region">${region}</span>
+      </div>`;
+    }).join('');
+  }
+  resultsContainer.classList.add('show');
+}
+
+function selectAirport(mode, code, city) {
+  state.selectedAirport[mode] = code;
+  document.getElementById(`${mode}-airport-search`).value = '';
+  document.getElementById(`${mode}-airport-search`).style.display = 'none';
+  document.getElementById(`${mode}-airport-results`).classList.remove('show');
+  document.getElementById(`${mode}-selected-code`).textContent = code;
+  document.getElementById(`${mode}-selected-city`).textContent = city;
+  document.getElementById(`${mode}-selected-airport`).classList.add('show');
+}
+
+function clearAirport(mode) {
+  state.selectedAirport[mode] = null;
+  document.getElementById(`${mode}-airport-search`).style.display = 'block';
+  document.getElementById(`${mode}-airport-search`).value = '';
+  document.getElementById(`${mode}-selected-airport`).classList.remove('show');
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.search-container')) {
+    document.querySelectorAll('.search-results').forEach(r => r.classList.remove('show'));
+  }
+});
+
+// ============================================================
+// 拼团人数选择
+// ============================================================
+function pickGroupSize(el, size) {
+  document.querySelectorAll('.group-size-btn').forEach(b => {
+    b.style.borderColor = 'rgba(255,255,255,.15)';
+    b.style.background = 'rgba(255,255,255,.08)';
+  });
+  el.style.borderColor = '#ff6348';
+  el.style.background = 'rgba(255,99,72,.15)';
+  state.groupSize = size;
+}
+
+// ============================================================
+// 提交表单
+// ============================================================
+function submitSoloForm() {
+  const firstname = document.getElementById('solo-firstname').value.trim();
+  const lastname = document.getElementById('solo-lastname').value.trim();
+  if (!firstname) return showToast(i18n.get('toast.fillFirstName'));
+  if (!lastname) return showToast(i18n.get('toast.fillLastName'));
+  if (!document.getElementById('solo-birthday').value) return showToast(i18n.get('toast.selectBirthday'));
+  if (!state.selectedAirport.solo) return showToast(i18n.get('toast.selectAirport'));
+  if (!document.getElementById('solo-date').value) return showToast(i18n.get('toast.selectDate'));
+  goPage('page-reveal');
+}
+
+function submitGroupForm() {
+  const firstname = document.getElementById('group-firstname').value.trim();
+  const lastname = document.getElementById('group-lastname').value.trim();
+  if (!firstname) return showToast(i18n.get('toast.fillFirstName'));
+  if (!lastname) return showToast(i18n.get('toast.fillLastName'));
+  if (!document.getElementById('group-birthday').value) return showToast(i18n.get('toast.selectBirthday'));
+  if (!state.selectedAirport.group) return showToast(i18n.get('toast.selectAirport'));
+  if (!document.getElementById('group-date').value) return showToast(i18n.get('toast.selectDate'));
+
+  state.groupMembers = [{
+    firstname, lastname,
+    name: firstname + ' ' + lastname,
+    airport: state.selectedAirport.group,
+    date: document.getElementById('group-date').value,
+    paid: true,
+    isLeader: true,
+  }];
+  renderGroupWait();
+  goPage('page-group-wait');
+  startGroupTimer();
+}
+
+// ============================================================
+// 拼团等待页
+// ============================================================
+function renderGroupWait() {
+  const list = document.getElementById('member-list');
+  list.innerHTML = state.groupMembers.map(m => {
+    const statusClass = m.isLeader ? 'status-you' : 'status-paid';
+    const statusText = m.isLeader ? i18n.get('group.leader') : i18n.get('group.paid');
+    return `<div class="member-item">
+      <div class="member-avatar">${m.name[0]}</div>
+      <div class="member-info">
+        <div class="member-name">${m.name} ${m.isLeader ? '👑' : ''}</div>
+        <div class="member-detail">${m.airport} · ${m.date}</div>
+      </div>
+      <div class="member-status ${statusClass}">${statusText}</div>
+    </div>`;
+  }).join('');
+
+  for (let i = state.groupMembers.length; i < state.groupSize; i++) {
+    list.innerHTML += `<div class="member-item" style="opacity:.3;border:1px dashed rgba(255,255,255,.15);">
+      <div class="member-avatar" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.3);">?</div>
+      <div class="member-info">
+        <div class="member-name" style="color:rgba(255,255,255,.3);">${i18n.get('group.waitJoin')}</div>
+        <div class="member-detail">—</div>
+      </div>
+      <div class="member-status status-waiting">${i18n.get('group.waitPay')}</div>
+    </div>`;
+  }
+
+  const paid = state.groupMembers.length;
+  const total = state.groupSize;
+  document.getElementById('group-progress-text').textContent = i18n.get('group.progress', { paid, total });
+  document.getElementById('group-progress-bar').style.width = `${(paid / total) * 100}%`;
+
+  const btn = document.getElementById('btn-open-group');
+  if (paid >= 2) {
+    btn.disabled = false;
+    btn.textContent = paid >= total ? i18n.get('group.fullOpenBtn') : i18n.get('group.canOpenBtn', { paid });
+  } else {
+    btn.disabled = true;
+    btn.textContent = i18n.get('group.canOpen');
+  }
+}
+
+function simulateMemberJoin() {
+  if (state.groupMembers.length >= state.groupSize) return showToast(i18n.get('toast.groupFull'));
+  const name = randomFrom(fakeNames.filter(n => !state.groupMembers.find(m => m.name.startsWith(n))));
+  if (!name) return showToast(i18n.get('toast.noMoreMembers'));
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 20 + Math.floor(Math.random() * 30));
+  state.groupMembers.push({
+    firstname: name, lastname: '',
+    name, airport: randomFrom(fakeAirports),
+    date: tomorrow.toISOString().split('T')[0],
+    paid: true, isLeader: false,
+  });
+  showToast(i18n.get('toast.memberJoined', { name }));
+  renderGroupWait();
+}
+
+let groupTimerInterval;
+function startGroupTimer() {
+  let seconds = 86400;
+  clearInterval(groupTimerInterval);
+  groupTimerInterval = setInterval(() => {
+    seconds--;
+    if (seconds <= 0) { clearInterval(groupTimerInterval); return; }
+    const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    document.getElementById('group-timer').textContent = `${h}:${m}:${s}`;
+  }, 1000);
+}
+
+function openGroupBox() {
+  goPage('page-reveal');
+}
+
+// ============================================================
+// 地图初始化
+// ============================================================
+function initMap() {
+  const dotsGroup = document.getElementById('destination-dots');
+  dotsGroup.innerHTML = destinations.map((dest, i) => {
+    const city = i18n.currentLang === 'zh' ? dest.cityZh : dest.cityEn;
+    return `<g class="destination-dot" data-index="${i}">
+      <circle cx="${dest.x}" cy="${dest.y}" r="4" fill="rgba(255,255,255,.2)"/>
+      <text x="${dest.x}" y="${dest.y - 8}" text-anchor="middle" class="destination-label">${dest.code}</text>
+    </g>`;
+  }).join('');
+
+  document.getElementById('dart-marker').style.display = 'none';
+  document.getElementById('reveal-destination').classList.remove('show');
+  document.getElementById('reveal-next-btn').style.display = 'none';
+  document.getElementById('reveal-label').textContent = i18n.get('reveal.clickToStart');
+  document.getElementById('reveal-label').style.display = 'block';
+  document.getElementById('us-map').onclick = startMapAnimation;
+}
+
+function startMapAnimation() {
+  document.getElementById('us-map').onclick = null;
+  document.getElementById('reveal-label').textContent = i18n.get('reveal.drawing');
+
+  const dartMarker = document.getElementById('dart-marker');
+  dartMarker.style.display = 'block';
+
+  const finalDest = randomFrom(destinations);
+  let jumps = 0;
+  const maxJumps = 12;
+
+  const jumpInterval = setInterval(() => {
+    const randomDest = randomFrom(destinations);
+    dartMarker.setAttribute('transform', `translate(${randomDest.x}, ${randomDest.y})`);
+
+    document.querySelectorAll('.destination-dot circle').forEach(c => {
+      c.setAttribute('fill', 'rgba(255,255,255,.2)');
+    });
+    const currentDot = document.querySelector(`.destination-dot[data-index="${destinations.indexOf(randomDest)}"] circle`);
+    if (currentDot) currentDot.setAttribute('fill', '#ffd93d');
+
+    jumps++;
+    if (jumps >= maxJumps) {
+      clearInterval(jumpInterval);
+      dartMarker.setAttribute('transform', `translate(${finalDest.x}, ${finalDest.y})`);
+
+      document.querySelectorAll('.destination-dot circle').forEach(c => {
+        c.setAttribute('fill', 'rgba(255,255,255,.2)');
+      });
+      const finalDot = document.querySelector(`.destination-dot[data-index="${destinations.indexOf(finalDest)}"] circle`);
+      if (finalDot) finalDot.setAttribute('fill', '#ff6348');
+
+      state.destination = finalDest;
+
+      setTimeout(() => {
+        const city = i18n.currentLang === 'zh' ? finalDest.cityZh : finalDest.cityEn;
+        document.getElementById('reveal-code').textContent = finalDest.code;
+        document.getElementById('reveal-city').textContent = `${finalDest.emoji} ${city}`;
+        document.getElementById('reveal-destination').classList.add('show');
+        document.getElementById('reveal-label').style.display = 'none';
+        document.getElementById('reveal-next-btn').style.display = 'flex';
+        spawnConfetti();
+      }, 300);
+    }
+  }, 150);
+}
+
+function spawnConfetti() {
+  const colors = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#a855f7','#ff8a5c','#f9ca24'];
+  for (let i = 0; i < 40; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.animationDelay = Math.random() * .5 + 's';
+    c.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+    c.style.width = (4 + Math.random() * 8) + 'px';
+    c.style.height = (4 + Math.random() * 8) + 'px';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 4000);
+  }
+}
+
+// ============================================================
+// 结果页
+// ============================================================
+function showResult() {
+  const dest = state.destination;
+  const isGroup = state.groupMembers.length > 1;
+  const marketPrice = 80 + Math.floor(Math.random() * 220);
+  // 模拟实际税费（最高不超过20%，拼团享8折）
+  const maxTaxRate = 0.20;
+  const actualTaxRate = 0.05 + Math.random() * (maxTaxRate - 0.05); // 5%-20%之间随机
+  const baseTax = Math.round(marketPrice * actualTaxRate);
+  const tax = isGroup ? Math.round(baseTax * 0.8) : baseTax;
+  const taxDisplayRate = Math.round((tax / marketPrice) * 100);
+
+  const departureAirport = isGroup ? state.selectedAirport.group || 'LAX' : state.selectedAirport.solo || 'SFO';
+  const dateVal = isGroup
+    ? document.getElementById('group-date').value || '2026-06-15'
+    : document.getElementById('solo-date').value || '2026-06-15';
+  const flightNum = randomFrom(['AA','UA','DL','WN','B6','AS']) + (100 + Math.floor(Math.random() * 900));
+  const depTime = `${6 + Math.floor(Math.random() * 14)}:${String(Math.floor(Math.random() * 6) * 10).padStart(2, '0')}`;
+  const arrTime = `${8 + Math.floor(Math.random() * 14)}:${String(Math.floor(Math.random() * 6) * 10).padStart(2, '0')}`;
+  const destCity = i18n.currentLang === 'zh' ? dest.cityZh : dest.cityEn;
+
+  let html = `
+    <div class="result-route">
+      <div class="result-airport">${departureAirport}</div>
+      <div class="result-arrow">✈️ →</div>
+      <div class="result-airport" style="color:#ffd93d;">${dest.code}</div>
+    </div>
+    <div class="result-detail">
+      <div class="result-item"><div class="result-item-label">${i18n.get('result.destination')}</div><div class="result-item-value">${dest.emoji} ${destCity}</div></div>
+      <div class="result-item"><div class="result-item-label">${i18n.get('result.departureDate')}</div><div class="result-item-value">${dateVal}</div></div>
+      <div class="result-item"><div class="result-item-label">${i18n.get('result.flight')}</div><div class="result-item-value">${flightNum}</div></div>
+      <div class="result-item"><div class="result-item-label">${i18n.get('result.time')}</div><div class="result-item-value">${depTime} - ${arrTime}</div></div>
+      <div class="result-item"><div class="result-item-label">${i18n.get('result.marketPrice')}</div><div class="result-item-value">$${marketPrice}</div></div>
+      <div class="result-item"><div class="result-item-label">${i18n.get('result.tax')}</div><div class="result-item-value tax-highlight">$${tax}${isGroup ? '（拼团8折）' : ''}</div></div>
+    </div>`;
+
+  if (isGroup && state.groupMembers.length > 1) {
+    html += `<div class="group-members-result"><div style="font-size:12px;color:rgba(255,255,255,.3);margin-bottom:8px;">${i18n.get('result.groupMembers')}</div>`;
+    const dotColors = ['#ff6b6b','#6bcb77','#4d96ff','#ffd93d','#a855f7'];
+    state.groupMembers.forEach((m, i) => {
+      html += `<div class="group-member-row">
+        <div class="group-member-dot" style="background:${dotColors[i % dotColors.length]}"></div>
+        <div class="group-member-name">${m.name} ${m.isLeader ? '👑' : ''}</div>
+        <div class="group-member-route">${m.airport} → ${dest.code}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  document.getElementById('result-card').innerHTML = html;
+
+  // 选项描述
+  document.getElementById('option-a-desc').textContent = isGroup
+    ? i18n.get('option.a.descGroup', { tax })
+    : i18n.get('option.a.desc', { tax, rate: '20%' });
+
+  document.getElementById('option-b-desc').textContent = isGroup
+    ? i18n.get('option.b.descGroup', { n: state.groupMembers.length + 1 })
+    : i18n.get('option.b.desc');
+
+  document.getElementById('result-countdown').innerHTML = i18n.get('result.countdown');
+  state.rerollNeeded = isGroup ? state.groupMembers.length + 1 : 2;
+
+  goPage('page-result');
+}
+
+// ============================================================
+// 选择选项
+// ============================================================
+function chooseOption(opt) {
+  if (opt === 'a') {
+    const isGroup = state.groupMembers.length > 1;
+    const marketPrice = 80 + Math.floor(Math.random() * 220);
+    const tax = Math.round(marketPrice * (isGroup ? 0.16 : 0.2));
+    document.getElementById('confirm-a-detail').innerHTML = i18n.get('confirm.detail', { tax });
+    goPage('page-confirm-a');
+  } else if (opt === 'b') {
+    if (state.rerollCount >= state.maxReroll) return showToast(i18n.get('toast.rerollUsedUp'));
+    state.rerollInvited = 0;
+    const isGroup = state.groupMembers.length > 1;
+    state.rerollNeeded = isGroup ? state.groupMembers.length + 1 : 2;
+
+    document.getElementById('reroll-rule-text').textContent = isGroup
+      ? i18n.get('reroll.ruleTextGroup', { n: state.rerollNeeded })
+      : i18n.get('reroll.ruleText', { n: state.rerollNeeded });
+
+    document.getElementById('reroll-current').textContent = '0';
+    document.getElementById('reroll-target-text').textContent = i18n.get('reroll.newUsers', { n: state.rerollNeeded });
+    document.getElementById('reroll-progress-bar').style.width = '0%';
+    document.getElementById('reroll-remaining-text').textContent = i18n.get('reroll.remaining', { n: state.maxReroll - state.rerollCount });
+
+    const btn = document.getElementById('btn-do-reroll');
+    btn.disabled = true;
+    btn.textContent = i18n.get('reroll.incomplete');
+    goPage('page-reroll');
+  } else if (opt === 'c') {
+    goPage('page-voucher');
+  }
+}
+
+// ============================================================
+// Re-roll
+// ============================================================
+function simulateRerollInvite() {
+  state.rerollInvited++;
+  const pct = Math.min((state.rerollInvited / state.rerollNeeded) * 100, 100);
+  document.getElementById('reroll-current').textContent = state.rerollInvited;
+  document.getElementById('reroll-progress-bar').style.width = pct + '%';
+
+  if (state.rerollInvited >= state.rerollNeeded) {
+    const btn = document.getElementById('btn-do-reroll');
+    btn.disabled = false;
+    btn.textContent = i18n.get('reroll.doReroll');
+    btn.onclick = doReroll;
+    showToast(i18n.get('toast.rerollComplete'));
+  } else {
+    showToast(i18n.get('toast.rerollProgress', { current: state.rerollInvited, total: state.rerollNeeded }));
+  }
+}
+
+function doReroll() {
+  state.rerollCount++;
+  state.destination = randomFrom(destinations);
+  showToast(i18n.get('toast.rerollSuccess'));
+  goPage('page-reveal');
+}
+
+// ============================================================
+// 初始化
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const minDate = new Date();
+  minDate.setDate(minDate.getDate() + 14);
+  const minStr = minDate.toISOString().split('T')[0];
+  document.getElementById('solo-date').min = minStr;
+  document.getElementById('group-date').min = minStr;
+
+  // 应用初始语言
+  i18n.apply();
+});
+</script>
+</body>
+</html>
