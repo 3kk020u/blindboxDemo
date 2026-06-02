@@ -24,35 +24,35 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .lang-btn.active { background: rgba(255,255,255,.15); color: #fff; }
 
 /* ===== 首页 ===== */
-.hero { text-align: center; padding-top: 40px; }
-.logo { font-size: 28px; font-weight: 800; letter-spacing: 2px; background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
-.tagline { color: rgba(255,255,255,.6); font-size: 14px; margin-bottom: 32px; }
+.hero { text-align: center; padding-top: 16px; }
+.logo { font-size: 24px; font-weight: 800; letter-spacing: 2px; background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; }
+.tagline { color: rgba(255,255,255,.6); font-size: 13px; margin-bottom: 16px; }
 
-.blind-box-visual { width: 160px; height: 160px; margin: 0 auto 24px; position: relative; cursor: pointer; }
-.box-body { width: 160px; height: 130px; background: linear-gradient(145deg, #ff6b6b, #ee5a24); border-radius: 16px; position: absolute; bottom: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 20px 60px rgba(255,107,107,.3); }
-.box-body::after { content: '?'; font-size: 56px; font-weight: 900; color: rgba(255,255,255,.9); }
-.box-lid { width: 176px; height: 40px; background: linear-gradient(145deg, #ff8a5c, #ff6348); border-radius: 10px 10px 4px 4px; position: absolute; top: 0; left: -8px; box-shadow: 0 -4px 20px rgba(255,99,72,.3); transition: transform .6s cubic-bezier(.68,-.55,.27,1.55); transform-origin: left bottom; }
-.blind-box-visual:hover .box-lid, .blind-box-visual.opening .box-lid { transform: rotateZ(-30deg) translateY(-20px); }
-.box-ribbon { width: 24px; height: 100%; background: linear-gradient(180deg, #ffd93d, #f9ca24); position: absolute; left: 50%; transform: translateX(-50%); border-radius: 0 0 10px 10px; }
+.blind-box-visual { width: 100px; height: 100px; margin: 0 auto 12px; position: relative; cursor: pointer; }
+.box-body { width: 100px; height: 80px; background: linear-gradient(145deg, #ff6b6b, #ee5a24); border-radius: 12px; position: absolute; bottom: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 16px 40px rgba(255,107,107,.3); }
+.box-body::after { content: '?'; font-size: 36px; font-weight: 900; color: rgba(255,255,255,.9); }
+.box-lid { width: 110px; height: 26px; background: linear-gradient(145deg, #ff8a5c, #ff6348); border-radius: 8px 8px 3px 3px; position: absolute; top: 0; left: -5px; box-shadow: 0 -3px 15px rgba(255,99,72,.3); transition: transform .6s cubic-bezier(.68,-.55,.27,1.55); transform-origin: left bottom; }
+.blind-box-visual:hover .box-lid, .blind-box-visual.opening .box-lid { transform: rotateZ(-30deg) translateY(-14px); }
+.box-ribbon { width: 16px; height: 100%; background: linear-gradient(180deg, #ffd93d, #f9ca24); position: absolute; left: 50%; transform: translateX(-50%); border-radius: 0 0 6px 6px; }
 
-.price-tag { font-size: 36px; font-weight: 900; margin-bottom: 4px; }
-.price-tag span { font-size: 18px; font-weight: 400; color: rgba(255,255,255,.6); }
-.original-price { color: rgba(255,255,255,.3); text-decoration: line-through; font-size: 13px; margin-bottom: 20px; }
+.price-tag { font-size: 28px; font-weight: 900; margin-bottom: 2px; }
+.price-tag span { font-size: 14px; font-weight: 400; color: rgba(255,255,255,.6); }
+.original-price { color: rgba(255,255,255,.3); text-decoration: line-through; font-size: 12px; margin-bottom: 12px; }
 
 /* ===== 规则说明 ===== */
-.rules-section { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 16px; margin: 20px 0; text-align: left; }
-.rules-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-.rules-list { font-size: 12px; color: rgba(255,255,255,.6); line-height: 1.8; padding-left: 0; list-style: none; }
-.rules-list li { margin-bottom: 6px; padding-left: 16px; position: relative; }
+.rules-section { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 10px; margin: 12px 0; text-align: left; }
+.rules-title { font-size: 12px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
+.rules-list { font-size: 11px; color: rgba(255,255,255,.6); line-height: 1.6; padding-left: 0; list-style: none; }
+.rules-list li { margin-bottom: 4px; padding-left: 12px; position: relative; }
 .rules-list li::before { content: '•'; position: absolute; left: 0; color: #ff6348; }
 .rules-highlight { color: #ffd93d; font-weight: 600; }
-.rules-tag { display: inline-block; background: rgba(107,203,119,.15); color: #6bcb77; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-left: 4px; }
+.rules-tag { display: inline-block; background: rgba(107,203,119,.15); color: #6bcb77; padding: 1px 4px; border-radius: 3px; font-size: 10px; margin-left: 2px; }
 
 /* ===== 出发地列表 ===== */
-.departure-section { margin: 20px 0; }
-.departure-title { font-size: 13px; color: rgba(255,255,255,.5); margin-bottom: 10px; }
-.departure-grid { display: flex; flex-wrap: wrap; gap: 6px; }
-.departure-tag { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); padding: 4px 10px; border-radius: 6px; font-size: 11px; color: rgba(255,255,255,.5); }
+.departure-section { margin: 12px 0; }
+.departure-title { font-size: 11px; color: rgba(255,255,255,.5); margin-bottom: 6px; }
+.departure-grid { display: flex; flex-wrap: wrap; gap: 4px; }
+.departure-tag { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); padding: 2px 6px; border-radius: 4px; font-size: 10px; color: rgba(255,255,255,.5); }
 .departure-tag span { color: rgba(255,255,255,.8); font-weight: 600; }
 
 /* ===== 按钮 ===== */
@@ -222,7 +222,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
       <div class="box-body"></div>
     </div>
     <div class="price-tag">$29.99 <span data-i18n="home.perBox"></span></div>
-    <div class="original-price" data-i18n="home.marketPrice"></div>
 
     <!-- 规则说明 -->
     <div class="rules-section">
@@ -531,11 +530,10 @@ const i18n = {
     // 首页
     'home.tagline': '✈️ 机票盲盒 · 未知目的地 · 超低价格',
     'home.perBox': '/个',
-    'home.marketPrice': '机票市场价 $80-$300',
     'home.rulesTitle': '📋 盲盒规则',
     'home.rules': [
       '购买后随机获得一张飞往美国境内目的地的机票',
-      '确认兑换时需支付实际税费（最高不超过票面价值的 <span class="rules-highlight">20%</span>，拼团享 <span class="rules-highlight">8折</span> 优惠）',
+      '确认兑换后即可直接获得该机票，无需额外支付任何费用',
       '对目的地不满意？邀请好友注册即可 <span class="rules-highlight">Re-roll</span> 重新抽取',
       '放弃兑换可获得 <span class="rules-highlight">$39.99</span> 代金券（180天有效）<span class="rules-tag">比购买价多$10</span>',
       '每期限量 500 个，每人限购 3 个'
@@ -549,7 +547,7 @@ const i18n = {
     'mode.soloTitle': '单人模式',
     'mode.soloDesc': '独自购买，独立开箱<br>不满意可 Re-roll 或换代金券',
     'mode.groupTitle': '拼团模式',
-    'mode.groupBadge': '税费8折',
+    'mode.groupBadge': '共享目的地',
     'mode.groupDesc': '2-5人拼团，共享目的地<br>出发机场和日期各人独立',
 
     // 表单
@@ -601,15 +599,14 @@ const i18n = {
     'result.departureDate': '出发日期',
     'result.flight': '航班',
     'result.time': '时间',
-    'result.marketPrice': '市场价',
-    'result.tax': '税费',
+    'result.tax': '票价',
     'result.groupMembers': '拼团成员',
     'result.countdown': '请在 <span>24小时</span> 内做出选择，超时将自动兑换 $29.99 代金券',
 
     // 选项
     'option.a.title': '✅ 选项A：确认兑换机票',
-    'option.a.desc': '支付实际税费 $${tax}（最高不超过票面价值的${rate}）即可获得该机票',
-    'option.a.descGroup': '支付实际税费 $${tax}（拼团享8折优惠）即可获得该机票',
+    'option.a.desc': '确认后即可直接获得该机票，无需额外支付任何费用',
+    'option.a.descGroup': '确认后全团成员均可直接获得该机票，无需额外支付任何费用',
     'option.b.title': '🔄 选项B：Re-roll 重抽',
     'option.b.desc': '邀请 2 位新用户注册，获得重新抽取目的地的机会',
     'option.b.descGroup': '团长分享链接，邀请 {n} 位新用户注册，全团目的地重新抽取',
@@ -619,7 +616,7 @@ const i18n = {
     // 确认
     'confirm.title': '确认兑换',
     'confirm.success': '机票兑换成功！',
-    'confirm.detail': '已支付税费 <span style="color:#ffd93d;font-weight:700;">$${tax}</span><br><br>航班信息已发送至您的 HopeGoo 账户<br>请在 App 中查看电子客票',
+    'confirm.detail': '航班信息已发送至您的 HopeGoo 账户<br>请在 App 中查看电子客票',
     'confirm.backHome': '返回首页',
 
     // Re-roll
@@ -667,11 +664,10 @@ const i18n = {
     // Home
     'home.tagline': '✈️ Flight Mystery Box · Unknown Destination · Ultra Low Price',
     'home.perBox': '/box',
-    'home.marketPrice': 'Market price $80-$300',
     'home.rulesTitle': '📋 How It Works',
     'home.rules': [
       'Get a random flight to a destination within the US',
-      'Pay actual airline taxes when redeeming (max <span class="rules-highlight">20%</span> of ticket value, <span class="rules-highlight">20% off</span> for groups)',
+      'Redeem your flight directly with no additional fees',
       'Not satisfied? Invite friends to <span class="rules-highlight">Re-roll</span> for a new destination',
       'Exchange for a <span class="rules-highlight">$39.99</span> voucher (180 days valid) <span class="rules-tag">$10 bonus</span>',
       'Limited to 500 boxes per round, max 3 per person'
@@ -685,7 +681,7 @@ const i18n = {
     'mode.soloTitle': 'Solo Mode',
     'mode.soloDesc': 'Buy alone, open independently<br>Re-roll or exchange for voucher if unsatisfied',
     'mode.groupTitle': 'Group Mode',
-    'mode.groupBadge': '20% Tax Off',
+    'mode.groupBadge': 'Same Destination',
     'mode.groupDesc': '2-5 people, same destination<br>Each person chooses their own departure',
 
     // Form
@@ -737,15 +733,14 @@ const i18n = {
     'result.departureDate': 'Date',
     'result.flight': 'Flight',
     'result.time': 'Time',
-    'result.marketPrice': 'Market Price',
-    'result.tax': 'Taxes',
+    'result.tax': 'Price',
     'result.groupMembers': 'Group Members',
     'result.countdown': 'Make your choice within <span>24 hours</span>, or auto-convert to $29.99 voucher',
 
     // Options
     'option.a.title': '✅ Option A: Confirm & Redeem',
-    'option.a.desc': 'Pay airline taxes $${tax} (max ${rate} of ticket value) to get this flight',
-    'option.a.descGroup': 'Pay airline taxes $${tax} (group gets 20% off) to get this flight',
+    'option.a.desc': 'Confirm to get this flight with no additional fees',
+    'option.a.descGroup': 'Confirm and all group members get this flight with no additional fees',
     'option.b.title': '🔄 Option B: Re-roll',
     'option.b.desc': 'Invite 2 new users to re-draw destination',
     'option.b.descGroup': 'Leader shares link, invite {n} new users to re-draw for entire group',
@@ -755,7 +750,7 @@ const i18n = {
     // Confirm
     'confirm.title': 'Confirmation',
     'confirm.success': 'Flight Redeemed!',
-    'confirm.detail': 'Taxes paid: <span style="color:#ffd93d;font-weight:700;">$${tax}</span><br><br>Flight details sent to your HopeGoo account<br>Check your e-ticket in the app',
+    'confirm.detail': 'Flight details sent to your HopeGoo account<br>Check your e-ticket in the app',
     'confirm.backHome': 'Back to Home',
 
     // Re-roll
@@ -1254,13 +1249,6 @@ function spawnConfetti() {
 function showResult() {
   const dest = state.destination;
   const isGroup = state.groupMembers.length > 1;
-  const marketPrice = 80 + Math.floor(Math.random() * 220);
-  // 模拟实际税费（最高不超过20%，拼团享8折）
-  const maxTaxRate = 0.20;
-  const actualTaxRate = 0.05 + Math.random() * (maxTaxRate - 0.05); // 5%-20%之间随机
-  const baseTax = Math.round(marketPrice * actualTaxRate);
-  const tax = isGroup ? Math.round(baseTax * 0.8) : baseTax;
-  const taxDisplayRate = Math.round((tax / marketPrice) * 100);
 
   const departureAirport = isGroup ? state.selectedAirport.group || 'LAX' : state.selectedAirport.solo || 'SFO';
   const dateVal = isGroup
@@ -1282,8 +1270,6 @@ function showResult() {
       <div class="result-item"><div class="result-item-label">${i18n.get('result.departureDate')}</div><div class="result-item-value">${dateVal}</div></div>
       <div class="result-item"><div class="result-item-label">${i18n.get('result.flight')}</div><div class="result-item-value">${flightNum}</div></div>
       <div class="result-item"><div class="result-item-label">${i18n.get('result.time')}</div><div class="result-item-value">${depTime} - ${arrTime}</div></div>
-      <div class="result-item"><div class="result-item-label">${i18n.get('result.marketPrice')}</div><div class="result-item-value">$${marketPrice}</div></div>
-      <div class="result-item"><div class="result-item-label">${i18n.get('result.tax')}</div><div class="result-item-value tax-highlight">$${tax}${isGroup ? '（拼团8折）' : ''}</div></div>
     </div>`;
 
   if (isGroup && state.groupMembers.length > 1) {
@@ -1303,8 +1289,8 @@ function showResult() {
 
   // 选项描述
   document.getElementById('option-a-desc').textContent = isGroup
-    ? i18n.get('option.a.descGroup', { tax })
-    : i18n.get('option.a.desc', { tax, rate: '20%' });
+    ? i18n.get('option.a.descGroup')
+    : i18n.get('option.a.desc');
 
   document.getElementById('option-b-desc').textContent = isGroup
     ? i18n.get('option.b.descGroup', { n: state.groupMembers.length + 1 })
@@ -1321,10 +1307,7 @@ function showResult() {
 // ============================================================
 function chooseOption(opt) {
   if (opt === 'a') {
-    const isGroup = state.groupMembers.length > 1;
-    const marketPrice = 80 + Math.floor(Math.random() * 220);
-    const tax = Math.round(marketPrice * (isGroup ? 0.16 : 0.2));
-    document.getElementById('confirm-a-detail').innerHTML = i18n.get('confirm.detail', { tax });
+    document.getElementById('confirm-a-detail').innerHTML = i18n.get('confirm.detail');
     goPage('page-confirm-a');
   } else if (opt === 'b') {
     if (state.rerollCount >= state.maxReroll) return showToast(i18n.get('toast.rerollUsedUp'));
